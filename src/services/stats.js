@@ -51,7 +51,24 @@ export function computeDashboardStats(plans) {
     tripTypeDist,
     categorySpend,
     perTripSpend,
+    ratingTrend: computeRatingTrend(plans),
   }
+}
+
+// ===== 出行评分走势 =====
+// 按出发日期升序排列，每次出行一个数据点；未评分或评分非法的出行直接跳过，
+// 历史数据（summary 为 null 或缺少 rating）无需迁移即可安全读取
+export function computeRatingTrend(plans) {
+  return plans
+    .map((p) => ({
+      planId: p.id,
+      label: p.name,
+      date: p.startDate || String(p.createdAt || '').slice(0, 10),
+      value: Number(p.summary?.rating),
+    }))
+    .filter((d) => Number.isFinite(d.value) && d.value > 0)
+    .map((d) => ({ ...d, value: Math.min(5, d.value) }))
+    .sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0))
 }
 
 // ===== 成员聚合（供排行榜使用） =====

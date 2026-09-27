@@ -5,6 +5,7 @@ import { useTravelStore } from '../stores/travel'
 import { formatMoney } from '../utils/format'
 import BarChart from '../components/charts/BarChart.vue'
 import DonutChart from '../components/charts/DonutChart.vue'
+import LineChart from '../components/charts/LineChart.vue'
 
 const store = useTravelStore()
 const router = useRouter()
@@ -51,6 +52,14 @@ const statCards = computed(() => [
       <div class="card mt-16">
         <h3 class="card-title">各次出行花费对比</h3>
         <BarChart :data="stats.perTripSpend" :formatter="money" color="#10b981" />
+      </div>
+
+      <div class="card mt-16">
+        <h3 class="card-title">出行评分走势</h3>
+        <LineChart
+          :data="stats.ratingTrend"
+          empty-text="还没有出行评分，完成出行总结后即可查看评分走势"
+        />
       </div>
     </template>
   </div>
