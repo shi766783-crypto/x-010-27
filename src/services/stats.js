@@ -51,7 +51,33 @@ export function computeDashboardStats(plans) {
     tripTypeDist,
     categorySpend,
     perTripSpend,
+    ratingTrend: computeRatingTrend(plans),
   }
+}
+
+// 出行时间排序依据：优先出行开始日期，缺失时回退到创建时间
+function tripTime(plan) {
+  const start = Date.parse(plan.startDate)
+  if (!Number.isNaN(start)) return start
+  const created = Date.parse(plan.createdAt)
+  return Number.isNaN(created) ? 0 : created
+}
+
+// ===== 出行评分走势（按时间升序，跳过没有评分的出行） =====
+export function computeRatingTrend(plans) {
+  return (plans || [])
+    .filter((p) => {
+      const rating = Number(p?.summary?.rating)
+      return Number.isFinite(rating) && rating > 0
+    })
+    .map((p) => ({
+      label: p.name || '未命名出行',
+      value: Number(p.summary.rating),
+      date: p.startDate || '',
+      time: tripTime(p),
+    }))
+    .sort((a, b) => a.time - b.time)
+    .map(({ time, ...item }) => item)
 }
 
 // ===== 成员聚合（供排行榜使用） =====

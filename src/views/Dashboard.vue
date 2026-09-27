@@ -5,12 +5,14 @@ import { useTravelStore } from '../stores/travel'
 import { formatMoney } from '../utils/format'
 import BarChart from '../components/charts/BarChart.vue'
 import DonutChart from '../components/charts/DonutChart.vue'
+import LineChart from '../components/charts/LineChart.vue'
 
 const store = useTravelStore()
 const router = useRouter()
 
 const stats = computed(() => store.dashboardStats)
 const money = (v) => formatMoney(v)
+const ratingText = (v) => `${v}分`
 
 const statCards = computed(() => [
   { label: '累计出行次数', value: stats.value.totalTrips, suffix: '次' },
@@ -46,6 +48,11 @@ const statCards = computed(() => [
           <h3 class="card-title">花费分类汇总</h3>
           <DonutChart :data="stats.categorySpend" :formatter="money" />
         </div>
+      </div>
+
+      <div class="card mt-16">
+        <h3 class="card-title">出行评分走势</h3>
+        <LineChart :data="stats.ratingTrend" :max="5" :formatter="ratingText" />
       </div>
 
       <div class="card mt-16">
